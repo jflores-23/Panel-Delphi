@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel Delphi — Compensación de Biodiversidad SEA </title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --color-bg: #ffffff;
+    --color-bg-secondary: #f5f5f3;
+    --color-bg-tertiary: #eeede8;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-border: rgba(0,0,0,0.12);
+    --color-border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --info-bg: #E6F1FB;
+    --info-text: #185FA5;
+    --info-border: #85B7EB;
+    --success-bg: #EAF3DE;
+    --success-text: #3B6D11;
+    --success-border: #97C459;
+    --warning-bg: #FAEEDA;
+    --warning-text: #854F0B;
+    --warning-border: #EF9F27;
+    --danger-bg: #FCEBEB;
+    --danger-text: #A32D2D;
+    --cf1-bg: #EEEDFE;
+    --cf1-text: #534AB7;
+    --cf1-border: #AFA9EC;
+    --cf2-bg: #E1F5EE;
+    --cf2-text: #0F6E56;
+    --cf2-border: #5DCAA5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #1e1e1c;
+      --color-bg-secondary: #2a2a28;
+      --color-bg-tertiary: #313130;
+      --color-text-primary: #f0efe8;
+      --color-text-secondary: #a8a79f;
+      --color-border: rgba(255,255,255,0.1);
+      --color-border-md: rgba(255,255,255,0.2);
+      --info-bg: #0c2a44; --info-text: #85B7EB; --info-border: #185FA5;
+      --success-bg: #172804; --success-text: #97C459; --success-border: #3B6D11;
+      --warning-bg: #2a1a04; --warning-text: #EF9F27; --warning-border: #854F0B;
+      --danger-bg: #2a0c0c; --danger-text: #F09595;
+      --cf1-bg: #1a1840; --cf1-text: #AFA9EC; --cf1-border: #534AB7;
+      --cf2-bg: #042820; --cf2-text: #5DCAA5; --cf2-border: #0F6E56;
+    }
+  }
+
+  body { font-family: var(--font-sans); background: var(--color-bg-tertiary); color: var(--color-text-primary); min-height: 100vh; padding: 2rem 1rem; }
+
+  .app { max-width: 980px; margin: 0 auto; background: var(--color-bg); border-radius: var(--radius-lg); border: 0.5px solid var(--color-border); overflow: hidden; }
+
+  .app-header { padding: 1.5rem 1.75rem; border-bottom: 0.5px solid var(--color-border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--color-bg); }
+  .app-header h1 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .app-header p  { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; line-height: 1.5; }
+
+  .badge-ronda { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: var(--info-bg); color: var(--info-text); border: 0.5px solid var(--info-border); white-space: nowrap; flex-shrink: 0; }
+
+  .app-body { padding: 1.5rem 1.75rem; }
+
+  .expert-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .expert-bar label { font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; }
+  .expert-bar input { flex: 1; min-width: 200px; font-size: 14px; padding: 7px 12px; border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-sans); }
+  .expert-bar input:focus { outline: none; border-color: var(--info-border); }
+
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .progress-track { height: 4px; background: var(--color-bg-secondary); border-radius: 4px; overflow: hidden; }
+  .progress-fill  { height: 100%; background: var(--info-text); border-radius: 4px; transition: width 0.35s ease; }
+
+  .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tab-btn { font-size: 12px; padding: 6px 13px; border-radius: var(--radius-md); border: 0.5px solid var(--color-border); background: var(--color-bg); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
+  .tab-btn:hover  { border-color: var(--color-border-md); color: var(--color-text-primary); }
+  .tab-btn.active { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); }
+  .tab-btn.done   { border-color: var(--success-border); color: var(--success-text); background: var(--success-bg); }
+
+  .section-card { background: var(--color-bg); border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
+  .section-header { padding: 12px 16px; border-bottom: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 10px; background: var(--color-bg-secondary); }
+  .section-tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .tag-paisaje   { background: #E6F1FB; color: #185FA5; }
+  .tag-terrestre { background: #EAF3DE; color: #3B6D11; }
+  .tag-acuatico  { background: #E1F5EE; color: #0F6E56; }
+  .tag-comunidad { background: #FAEEDA; color: #854F0B; }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+
+  .param-row { padding: 16px; border-bottom: 0.5px solid var(--color-border); }
+  .param-row:last-child { border-bottom: none; }
+  .param-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .param-desc  { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 14px; line-height: 1.55; }
+
+  .score-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .score-grid-3 { grid-template-columns: 1fr; } }
+
+  .score-col { display: flex; flex-direction: column; gap: 7px; }
+
+  .score-col-label { font-size: 11px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-md); text-align: center; }
+  .lbl-ci  { background: var(--color-bg-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border); }
+  .lbl-cf1 { background: var(--cf1-bg); color: var(--cf1-text); border: 0.5px solid var(--cf1-border); }
+  .lbl-cf2 { background: var(--cf2-bg); color: var(--cf2-text); border: 0.5px solid var(--cf2-border); }
+
+  .score-input-wrap { display: flex; align-items: center; gap: 8px; background: var(--color-bg-secondary); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); padding: 8px 10px; }
+  .score-input-wrap:focus-within { border-color: var(--color-border-md); background: var(--color-bg); }
+  .score-input-wrap.is-disabled { opacity: 0.6; }
+  .score-range-note { font-size: 10px; color: var(--color-text-secondary); text-align: right; }
+
+  .score-meta-select { width: 100%; font-size: 12px; padding: 6px 8px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-sans); }
+  .score-meta-select:focus { outline: none; border-color: var(--info-border); }
+
+  input[type=range].score-range { flex: 1; height: 4px; cursor: pointer; }
+  input[type=range].ci-range  { accent-color: #185FA5; }
+  input[type=range].cf1-range { accent-color: #534AB7; }
+  input[type=range].cf2-range { accent-color: #0F6E56; }
+
+  .score-number { width: 38px; font-size: 14px; font-weight: 500; text-align: center; border: 0.5px solid var(--color-border); border-radius: 6px; padding: 4px 2px; background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-sans); -moz-appearance: textfield; }
+  .score-number::-webkit-inner-spin-button, .score-number::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .score-number:focus { outline: none; border-color: var(--info-border); }
+
+  .score-badge { display: block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 20px; text-align: center; min-height: 20px; }
+  .badge-empty { background: var(--color-bg-secondary); color: var(--color-text-secondary); }
+
+  .score-threshold-desc { font-size: 11px; color: var(--color-text-secondary); background: var(--color-bg-secondary); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); padding: 6px 8px; line-height: 1.45; min-height: 38px; }
+  .threshold-item { padding: 3px 5px; border-radius: 6px; margin-bottom: 3px; }
+  .threshold-item:last-child { margin-bottom: 0; }
+  .threshold-item.active { background: var(--info-bg); color: var(--info-text); border: 0.5px solid var(--info-border); }
+
+  .justif-wrap { margin-top: 12px; }
+  .justif-wrap textarea { width: 100%; font-size: 12px; padding: 8px 10px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg-secondary); color: var(--color-text-primary); resize: vertical; min-height: 52px; font-family: var(--font-sans); line-height: 1.5; }
+  .justif-wrap textarea:focus { outline: none; border-color: var(--color-border-md); background: var(--color-bg); }
+  .justif-wrap textarea::placeholder { color: var(--color-text-secondary); }
+  .justif-required-note { font-size: 11px; color: var(--warning-text); margin-top: 2px; }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 1.25rem; padding: 10px 14px; background: var(--color-bg-secondary); border-radius: var(--radius-md); border: 0.5px solid var(--color-border); font-size: 11px; color: var(--color-text-secondary); align-items: center; }
+  .legend strong { font-weight: 500; color: var(--color-text-primary); }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 3px; vertical-align: middle; }
+  .info-panel { margin-bottom: 1.25rem; background: var(--color-bg-secondary); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); padding: 12px 14px; }
+  .info-panel h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .info-panel p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 8px; }
+  .info-panel p:last-child { margin-bottom: 0; }
+  .info-panel a { color: var(--info-text); text-decoration: none; }
+  .info-panel a:hover { text-decoration: underline; }
+
+  .actions { display: flex; gap: 10px; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; padding-top: 1rem; border-top: 0.5px solid var(--color-border); }
+  @media (max-width: 480px) { .actions { flex-direction: column; } .actions button { width: 100%; } }
+
+  .btn-secondary { font-size: 13px; padding: 8px 16px; border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md); background: transparent; color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); }
+  .btn-secondary:hover { background: var(--color-bg-secondary); }
+  .btn-primary  { font-size: 13px; padding: 8px 18px; border: 0.5px solid var(--info-border); border-radius: var(--radius-md); background: var(--info-bg); color: var(--info-text); cursor: pointer; font-weight: 500; font-family: var(--font-sans); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-success  { font-size: 13px; padding: 8px 18px; border: 0.5px solid var(--success-border); border-radius: var(--radius-md); background: var(--success-bg); color: var(--success-text); cursor: pointer; font-weight: 500; font-family: var(--font-sans); }
+  .btn-success:hover { opacity: 0.85; }
+  .btn-export   { font-size: 13px; padding: 8px 18px; border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md); background: var(--color-bg-secondary); color: var(--color-text-primary); cursor: pointer; font-weight: 500; font-family: var(--font-sans); }
+  .btn-export:hover { background: var(--color-bg-tertiary); }
+
+  .results-panel { background: var(--color-bg); border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .results-title { font-size: 15px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .metric-card { background: var(--color-bg-secondary); border-radius: var(--radius-md); padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-value { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-value.neg { color: #A32D2D; }
+  .metric-value.pos { color: #3B6D11; }
+
+  .result-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; margin-top: 14px; flex-wrap: wrap; }
+  .result-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
+  .result-row:last-child { border-bottom: none; }
+  .result-name  { font-size: 12px; color: var(--color-text-secondary); flex: 1; min-width: 160px; padding-top: 3px; }
+  .result-chips { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+  .result-chip  { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .chip-ci  { background: var(--color-bg-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border); }
+  .chip-cf1 { background: var(--cf1-bg); color: var(--cf1-text); }
+  .chip-cf2 { background: var(--cf2-bg); color: var(--cf2-text); }
+  .delta-chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .delta-neg { background: #FCEBEB; color: #A32D2D; }
+  .delta-pos { background: #EAF3DE; color: #3B6D11; }
+  .delta-neu { background: var(--color-bg-secondary); color: var(--color-text-secondary); }
+  .justif-result { font-size: 11px; color: var(--color-text-secondary); font-style: italic; padding: 2px 0 5px; width: 100%; }
+
+  .warn-incomplete { font-size: 12px; color: var(--warning-text); background: var(--warning-bg); border: 0.5px solid var(--warning-border); border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 1rem; }
+  .app-footer { padding: 1rem 1.75rem; border-top: 0.5px solid var(--color-border); font-size: 11px; color: var(--color-text-secondary); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: var(--color-bg-secondary); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <h1>Panel Delphi: "Compensación de Biodiversidad Lagunillas"</h1>
+      <p>Guía Metodológica SEA 2023 — Evaluación  de parámetros de condición ecosistémica</p>
+    </div>
+    <span class="badge-ronda">Ronda 1</span>
+  </div>
+
+  <div class="app-body">
+    <div class="info-panel">
+      <h2>Uso del panel y referencias</h2>
+      <p>Esta interfaz ha sido creada para el cálculo del impacto residual (IR) en el humedal de Lagunillas, asumiendo dos escenarios distintos: 1) efecto del Proyecto sobre Lagunillas sin mitigación del impacto, y 2) efecto del Proyecto habiendo aplicado medidas de mitigación efectivas.</p>
+      <p>El impacto residual de estos dos escenarios se podría estimar en función de la información existente acerca de la condición de biodiversidad de Lagunillas durante tres períodos distintos: i) La situación del sitio pre proyecto, correspondiente a la condición natural de Lagunillas cuyo período finaliza en el momento en que se comenzaron las intervenciones del área (<1994), ii) la situación del área afectada post proyecto, representada por el período donde se observa el mayor impacto en biodiversidad antes del inicio de la medida de mitigación (2003-2006), y iii) la situación del área impactada tras la implementación efectiva del plan de manejo como medida de mitigación; esta situación se ve mejor representada a partir del año 2023 en adelante, momento en que se alcanzaron las condiciones de biodiversidad de la etapa de Mantención del Plan de Manejo y se espera que la biodiversidad no cambie en las etapas futuras.</p>
+      <p>Ante la carencia o falta de disponibilidad en algunos datos que permitan realizar el cálculo del IR, principalmente aquellos que permitan caracterizar la situación preimpacto e impacto sin mitigación, se elabora esta plataforma para desarrollar una evaluación de juicio experto.</p>
+      <p>Referencias metodológicas: <a href="https://cienciambiental.sharepoint.com/:b:/s/CompensacinLagunillasCMCC/IQBvtR7TTMsHSJpVmZe8Vw1GAXKQ6G6lnLgtRGjJQySvtUI?e=xWgT8D" target="_blank" rel="noopener noreferrer">PDF Guía Metodológica SEA 2023</a> y <a href="https://www.sea.gob.cl/documentacion/guias-y-criterios/guia-metodologica-para-la-compensacion-de-biodiversidad-en" target="_blank" rel="noopener noreferrer">Centro de Documentación SEA</a>.</p>
+      <p>Para facilitar el juicio de cada participante, se ha desarrollado el dashboard que permite visualizar los datos e información con la que contamos para ejecutar el cálculo: <a href="https://cienciambiental-lagunillas-dashboard.share.connect.posit.cloud/" target="_blank" rel="noopener noreferrer">Abrir dashboard</a>.</p>
+      <p><strong>Importante:</strong> las descripciones de <strong>0, 4, 7 y 10</strong> son referenciales. Si no reflejan exactamente su criterio experto, puede asignar <strong>cualquier valor entero entre 0 y 10</strong></p>
+    </div>
+
+    <div class="expert-bar">
+      <label for="expert-name">Nombre del experto:</label>
+      <input type="text" id="expert-name" placeholder="Ingrese su nombre completo..." autocomplete="name" />
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span id="progress-text">0 de 14 parámetros completados</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="showTab(0)" id="tab-0">Paisaje (Tabla 5. SEA)</button>
+      <button class="tab-btn" onclick="showTab(1)" id="tab-1">Ecosistema Terrestre: Comunidad (Tabla 7. SEA)</button>
+      <button class="tab-btn" onclick="showTab(2)" id="tab-2">Ecosistema Acuático: Condición (Tabla 11. SEA)</button>
+      <button class="tab-btn" onclick="showTab(3)" id="tab-3">Ecosistema Acuático: Comunidad (Tabla 12. SEA)</button>
+      <button class="tab-btn" onclick="showTab(4)" id="tab-4">Resultados</button> 
+    </div>
+
+    <div id="content-area"></div>
+    <div class="actions" id="actions-bar"></div>
+  </div>
+
+  <div class="app-footer">
+    <span>Panel Delphi — SEA 2023</span>
+    <span id="footer-date"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+document.getElementById('footer-date').textContent = new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+
+const tablas = [
+  {
+    id:'T5', titulo:'Condición de Paisaje', tag:'Paisaje', tagClass:'tag-paisaje',
+    params:[
+      {id:'A1', label:'A.1. Diversidad de objetos en el paisaje', desc:'Evaluando cambios los últimos 10 años. Índice de equidad o dominancia de coberturas de suelo (0=Baja diversidad, cambios negativos >50%; 10=Alta diversidad, sin cambios negativos o positivos).',
+        thresholds:{0:'Baja diversidad de coberturas de suelo en base a la cartografía de vegetación. Índice de equidad o dominancia fluctúa entre 0,75 y 1. Existen cambios negativos respecto al pasado (mayor al 50%).',4:'Media o baja diversidad de coberturas de suelo en base a la cartografía de vegetación. Índice de equidad o dominancia fluctúa entre >0,50 y < 0,75. Existen cambios negativos respecto al pasado (>10-50%).',7:'Adecuada diversidad de coberturas de suelo en base a la cartografía de vegetación. Índice de equidad o dominancia fluctúa entre >0,25 y 0,50. Existen mínimos cambios positivos respecto al pasado (0-10%).',10:'Alta diversidad de coberturas de suelo en base a la cartografía de vegetación. Índice de equidad o dominancia fluctúa entre >0 y <0,25. No existen cambios respecto al pasado o ellos son positivos (entre 5 y 10 años).'}},
+      {id:'A2', label:'A.2. Grado de fragmentación', desc:'Coberturas de suelo o formaciones vegetales distinguibles en el paisaje (0=Altamente fragmentadas, cambios >50%; 10=Sin cambios negativos respecto al pasado).',
+        thresholds:{0:'Las coberturas de suelo o formaciones vegetales distinguibles en el paisaje se encuentran altamente fragmentadas. Existen cambios respecto al pasado (mayor al 50%).',4:'Las coberturas de suelo o formaciones vegetales distinguibles en el paisaje se encuentran fragmentadas. Existen cambios respecto al pasado (>10 y < a 50%).',7:'Las coberturas de suelo o formaciones vegetales distinguibles en el paisaje presentan un bajo grado de fragmentación. Existen mínimos cambios positivos respecto al pasado (0-10%).',10:'No existen cambios respecto al pasado (entre 5 y 10 años).'}},
+      {id:'A3', label:'A.3. Conectividad', desc:'Relación área-perímetro para las especies listadas y conectividad del paisaje (0=Sin conectividad, cambios negativos >50%; 10=Conectividad adecuada, sin cambios negativos).',
+        thresholds:{0:'No existe conectividad del paisaje. Existen cambios negativos respecto al pasado (mayor al 50%).',4:'Existe una relación no adecuada de área perímetro para la mayoría de las especies listadas. Existen cambios negativos respecto al pasado (>10 y < a 50%).',7:'Existe una relación adecuada de área perímetro para la mayoría de las especies listadas. Existen mínimos cambios positivos respecto al pasado (0-10%).',10:'Existe la conectividad adecuada del paisaje. No existen cambios respecto al pasado o ellos son positivos (evaluados entre 5 y 10 años).'}}
+    ]
+  },
+  {
+    id:'T7', titulo:'Ecosistema Terrestre: Comunidad', tag:'Ec. Terrestre', tagClass:'tag-terrestre',
+    params:[
+      {id:'B1', label:'B.1. condición de la estructura', desc:'Estado de cobertura y estratificación de la vegetación (0=Severamente impactada; 10=Estado óptimo en cobertura y estratificación).',
+        thresholds:{0:'La estructura se encuentra severamente impactada en relación con su cobertura y estratificación.',4:'La estructura se encuentra impactada en relación con su cobertura y estratificación.',7:'La estructura se encuentra levemente impactada en relación con su cobertura y estratificación.',10:'La estructura se encuentra en estado óptimo en relación con su cobertura y estratificación.'}},
+      {id:'B2', label:'B.2. Composición', desc:'Proporción de especies nativas vs. exóticas o invasoras y riqueza/abundancia de nativas (0=Representada por exóticas, mínima riqueza nativa; 10=Solo nativas, sin exóticas, riqueza óptima).',
+        thresholds:{0:'La composición se encuentra representada por especies exóticas o invasoras. Riqueza y abundancia de especies nativas es mínima para el área.',4:'La composición se encuentra representada por especies nativas y mayoritariamente por especies exóticas o invasoras. Baja riqueza y abundancia de especies nativas para el área.',7:'La composición se encuentra representada principalmente por especies nativas, con mínima presencia de especies exóticas o invasoras. Adecuada riqueza y abundancia de especies nativas.',10:'La composición se encuentra representada por especies nativas, careciendo de la presencia de especies exóticas o invasoras. Riqueza y abundancia de especies nativas en estado óptimo.'}},
+      {id:'B3', label:'B.3. Ambientes de fauna (hábitat)', desc:'Presencia de ambientes de fauna para las especies listadas (0=No se presentan; 10=Todos los ambientes para las especies listadas).',
+        thresholds:{0:'No se presentan ambientes de fauna para las especies listadas.',4:'Se presentan algunos ambientes de fauna para las especies listadas (menos del 50%).',7:'Se presentan los ambientes de fauna para la mayoría (más del 50%) de las especies listadas.',10:'Se presentan todos los ambientes de fauna para las especies listadas.'}},
+      {id:'B4', label:'B.4. Regeneración y reclutamiento', desc:'Evidencia de regeneración normal y reclutamiento natural en el ecosistema (0=Sin evidencia; 10=Fuerte evidencia de regeneración y reclutamiento normal).',
+        thresholds:{0:'No existe evidencia de regeneración normal y reclutamiento natural.',4:'Existe evidencia de regeneración normal y reclutamiento natural, pero de forma escasa.',7:'Existe evidencia de regeneración cercana a lo normal y reclutamiento natural.',10:'Existe fuerte evidencia de regeneración normal y reclutamiento natural.'}}
+    ]
+  },
+  {
+    id:'T11', titulo:'Ecosistema Acuático: Condición', tag:'Ec. Acuático', tagClass:'tag-acuatico',
+    params:[
+      {id:'C11', label:'C.1.1. Nivel y flujo de agua', desc:'Niveles y flujos, profundidad, caudal ambiental y balance hídrico (0=Muy alterados, balance hídrico alterado; 10=Apropiados y óptimos para las comunidades).',
+        thresholds:{0:'Niveles y flujos de agua se encuentran alterados y con una gran variación respecto a los parámetros normales. Profundidad de agua y caudal ambiental inadecuado para las comunidades presentes en el sistema. Balance hídrico alterado.',4:'Niveles y flujos de agua sobre o bajo lo apropiado. Profundidad de agua y caudal ambiental poco adecuado para las comunidades presentes en el sistema. Balance hídrico poco alterado.',7:'Niveles y flujos de agua levemente sobre o bajo lo apropiado. Profundidad de agua y caudal ambiental adecuado para las comunidades presentes en el sistema pudiendo afectar a algunas especies. Balance hídrico cercano a lo apropiado.',10:'Niveles y flujos de agua apropiados. Profundidad de agua y caudal ambiental óptimo para las comunidades presentes en el sistema. Balance hídrico apropiado.'}},
+      {id:'C12', label:'C.1.2. Calidad de agua', desc:'Parámetros de calidad para las comunidades ecológicas presentes en el sistema (0=Muy alterada respecto a parámetros esperados; 10=óptima para las comunidades ecológicas).',
+        thresholds:{0:'La calidad de agua se encuentra muy alterada en relación con los parámetros esperados para las comunidades ecológicas presentes en el sistema.',4:'La calidad de agua presenta alteración de sus parámetros esperados para las comunidades ecológicas presentes en el sistema.',7:'La calidad de agua presenta baja alteración de sus parámetros esperados para las comunidades ecológicas presentes en el sistema.',10:'La calidad de agua es óptima para las comunidades ecológicas presentes en el sistema.'}},
+      {id:'C13', label:'C.1.3. Infiltración de agua', desc:'Infiltración considerando flujos subsuperficiales y subterráneos del humedal (0=Inadecuada para el sistema; 10=óptima para el sistema).',
+        thresholds:{0:'Infiltración inadecuada para el sistema.',4:'Infiltración poco adecuada para el sistema.',7:'Infiltración apropiada para el sistema.',10:'Infiltración óptima para el sistema.'}}
+    ]
+  },
+  {
+    id:'T12', titulo:'Ecosistema Acuático: Comunidad', tag:'Comunidades', tagClass:'tag-comunidad',
+    params:[
+      {id:'C21', label:'C.2.1. Estado de la estructura', desc:'Estado de cobertura y estratificación en el ecosistema acuático (0=Severamente impactada; 10=Estado óptimo en cobertura y estratificación).',
+        thresholds:{0:'La estructura se encuentra severamente impactada en relación con su cobertura y estratificación.',4:'La estructura se encuentra impactada en relación con su cobertura y estratificación.',7:'La estructura se encuentra levemente impactada en relación con su cobertura y estratificación.',10:'La estructura se encuentra en estado óptimo en relación con su cobertura y estratificación.'}},
+      {id:'C22', label:'C.2.2. Composición de flora y fauna', desc:'Proporción de especies nativas vs. exóticas o invasoras en el ecosistema acuático (0=Representada por exóticas, riqueza mínima; 10=Solo nativas, sin exóticas, riqueza óptima).',
+        thresholds:{0:'La composición se encuentra representada por especies exóticas o invasoras. Riqueza y abundancia de especies mínima para el área.',4:'La composición se encuentra representada por especies nativas y mayoritariamente por especies exóticas o invasoras. Baja riqueza y abundancia de especies para el área.',7:'La composición se encuentra representada principalmente por especies nativas, con mínima presencia de especies exóticas o invasoras. Adecuada riqueza y abundancia de especies.',10:'La composición se encuentra representada por especies nativas, careciendo de la presencia de especies exóticas o invasoras. Riqueza y abundancia de especies en estado óptimo.'}},
+      {id:'C23', label:'C.2.3. Ambientes de fauna (hábitat)', desc:'Presencia de ambientes de fauna para las especies listadas en el ecosistema acuático (0=No se presentan; 10=Todos los ambientes para las especies listadas).',
+        thresholds:{0:'No se presentan ambientes de fauna para las especies listadas.',4:'Se presentan algunos ambientes de fauna para las especies listadas (menos del 50%).',7:'Se presentan los ambientes de fauna para la mayoría (más del 50%) de las especies listadas.',10:'Se presentan todos los ambientes de fauna para las especies listadas.'}},
+      {id:'C24', label:'C.2.4. Regeneración y reclutamiento', desc:'Evidencia de regeneración normal y reclutamiento natural en el ecosistema acuático (0=Sin evidencia; 10=Fuerte evidencia de regeneración y reclutamiento normal).',
+        thresholds:{0:'No existe evidencia de regeneración normal y reclutamiento natural.',4:'Existe mínima evidencia de regeneración normal y reclutamiento natural.',7:'Existe evidencia de regeneración cercana a lo normal y reclutamiento natural.',10:'Existe fuerte evidencia de regeneración normal y reclutamiento natural.'}}
+    ]
+  }
+];
+
+const scores  = {};
+const justifs = {};
+const statuses = {};
+let currentTab = 0;
+const thresholdAnchors = [0,4,7,10];
+
+const paramThresholds = {};
+tablas.forEach(t => t.params.forEach(p => { if (p.thresholds) paramThresholds[p.id] = p.thresholds; }));
+
+function getThresholdDesc(paramId, val) {
+  const t = paramThresholds[paramId];
+  if (!t) return '';
+  return t[getThresholdBucket(val)];
+}
+function getThresholdBucket(val) {
+  const n = Number(val);
+  if (isNaN(n)) return 0;
+  return thresholdAnchors.reduce((best, cur) => Math.abs(cur - n) < Math.abs(best - n) ? cur : best, thresholdAnchors[0]);
+}
+function getThresholdLegendHtml(paramId, val) {
+  const t = paramThresholds[paramId];
+  if (!t) return '';
+  const b = getThresholdBucket(val);
+  const rows = [
+    {k:0, lbl:'0'},
+    {k:4, lbl:'4'},
+    {k:7, lbl:'7'},
+    {k:10, lbl:'10'}
+  ];
+  return rows.map(r=>{
+    const cls='threshold-item'+(r.k===b?' active':'');
+    return '<div class="'+cls+'"><strong>'+r.lbl+':</strong> '+t[r.k]+'</div>';
+  }).join('');
+}
+function applyThresholdDesc(uid, val, paramId) {
+  const el = document.getElementById('tdesc_'+uid);
+  if (!el) return;
+  el.innerHTML = getThresholdLegendHtml(paramId, val);
+}
+
+function skey(tabId, paramId, cond) { return tabId+'_'+paramId+'_'+cond; }
+function getScore(tabId, paramId, cond) { return scores[skey(tabId,paramId,cond)]; }
+function jkey(tabId, paramId, cond) { return tabId+'_'+paramId+'_'+cond; }
+function stkey(tabId, paramId, cond) { return tabId+'_'+paramId+'_'+cond; }
+function getJustif(tabId, paramId, cond) { return justifs[jkey(tabId,paramId,cond)] || ''; }
+function setJustif(tabId, paramId, cond, val) { justifs[jkey(tabId,paramId,cond)] = val; updateProgress(); renderTabButtons(); }
+function sanitizeStatus(v) { return v === 'no_responde' ? 'no_responde' : 'evaluado'; }
+function getStatus(tabId, paramId, cond) { return sanitizeStatus(statuses[stkey(tabId,paramId,cond)] || 'evaluado'); }
+function setStatus(tabId, paramId, cond, val) { statuses[stkey(tabId,paramId,cond)] = sanitizeStatus(val); }
+function statusLabel(v) {
+  if (v === 'no_responde') return 'No responde';
+  return 'Evaluado';
+}
+function normalizeScore(raw) {
+  const n = Number(raw);
+  if (isNaN(n)) return 0;
+  return Math.min(10, Math.max(0, Math.round(n)));
+}
+function isValidJustif(v) { return !!(v && v.trim()); }
+function isConditionComplete(tabId, paramId, cond) {
+  const status = getStatus(tabId,paramId,cond);
+  const hasJustif = isValidJustif(getJustif(tabId,paramId,cond));
+  if (!hasJustif) return false;
+  if (status === 'no_responde') return true;
+  return getScore(tabId,paramId,cond) !== undefined;
+}
+function scoreForCalc(tabId, paramId, cond) {
+  return getStatus(tabId,paramId,cond) === 'evaluado' ? getScore(tabId,paramId,cond) : undefined;
+}
+function displayScore(tabId, paramId, cond) {
+  return getStatus(tabId,paramId,cond) === 'evaluado' ? getScore(tabId,paramId,cond) : statusLabel(getStatus(tabId,paramId,cond));
+}
+
+function scoreColor(v) {
+  if (v===undefined||v===null) return null;
+  const b = getThresholdBucket(v);
+  if (b===0)  return {bg:'#FCEBEB',color:'#A32D2D'};
+  if (b===4)  return {bg:'#FAEEDA',color:'#854F0B'};
+  if (b===7)  return {bg:'#E6F1FB',color:'#185FA5'};
+  return {bg:'#EAF3DE',color:'#0F6E56'};
+}
+function scoreBadgeLabel(v) {
+  if (v===undefined||v===null) return 'Sin evaluar';
+  return 'Puntaje '+Number(v);
+}
+
+function applyBadge(uid, v) {
+  const badge = document.getElementById('badge_'+uid);
+  if (!badge) return;
+  const c = scoreColor(v);
+  if (c) { badge.style.background=c.bg; badge.style.color=c.color; }
+  else   { badge.className='score-badge badge-empty'; }
+  badge.textContent = scoreBadgeLabel(v);
+}
+
+function syncScore(tabId, paramId, cond, source, uid) {
+  const range = document.getElementById('range_'+uid);
+  const num   = document.getElementById('num_'+uid);
+  let raw = parseInt(source==='range' ? range.value : num.value);
+  if (isNaN(raw)) raw = 0;
+  raw = normalizeScore(Math.min(10, Math.max(0, raw)));
+  range.value = raw;
+  num.value   = raw;
+  scores[skey(tabId,paramId,cond)] = raw;
+  applyBadge(uid, raw);
+  applyThresholdDesc(uid, raw, paramId);
+  updateProgress();
+  renderTabButtons();
+}
+function syncStatus(tabId, paramId, cond, uid, val) {
+  setStatus(tabId, paramId, cond, val);
+  const disabled = val !== 'evaluado';
+  const range = document.getElementById('range_'+uid);
+  const num = document.getElementById('num_'+uid);
+  const wrap = document.getElementById('wrap_'+uid);
+  const badge = document.getElementById('badge_'+uid);
+  if (range) range.disabled = disabled;
+  if (num) num.disabled = disabled;
+  if (wrap) wrap.className = 'score-input-wrap' + (disabled ? ' is-disabled' : '');
+  if (badge) badge.textContent = disabled ? statusLabel(val) : scoreBadgeLabel(getScore(tabId,paramId,cond));
+  updateProgress();
+  renderTabButtons();
+}
+
+function countFilled() {
+  let n=0;
+  tablas.forEach(t=>t.params.forEach(p=>{
+    if(
+      isConditionComplete(t.id,p.id,'ci') &&
+      isConditionComplete(t.id,p.id,'cf1') &&
+      isConditionComplete(t.id,p.id,'cf2')
+    ) n++;
+  }));
+  return n;
+}
+function totalParams() { return tablas.reduce((s,t)=>s+t.params.length,0); }
+
+function updateProgress() {
+  const f=countFilled(), tot=totalParams(), pct=Math.round((f/tot)*100);
+  document.getElementById('progress-text').textContent=f+' de '+tot+' parámetros completados';
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-fill').style.width=pct+'%';
+}
+
+function isTabComplete(idx) {
+  const t=tablas[idx];
+  return t.params.every(p =>
+    isConditionComplete(t.id,p.id,'ci') &&
+    isConditionComplete(t.id,p.id,'cf1') &&
+    isConditionComplete(t.id,p.id,'cf2')
+  );
+}
+
+function renderTabButtons() {
+  for(let i=0;i<4;i++){
+    const btn=document.getElementById('tab-'+i);
+    btn.className='tab-btn'+(i===currentTab?' active':isTabComplete(i)?' done':'');
+  }
+  document.getElementById('tab-4').className='tab-btn'+(currentTab===4?' active':'');
+}
+
+function buildCol(tabId, paramId, cond, lblClass, lblText, rangeClass) {
+  const uid = tabId+'_'+paramId+'_'+cond;
+  const cur = getScore(tabId, paramId, cond);
+  const val = cur !== undefined ? cur : 0;
+  const c   = scoreColor(cur);
+  const badgeStyle = c ? 'background:'+c.bg+';color:'+c.color : '';
+  const badgeClass = c ? 'score-badge' : 'score-badge badge-empty';
+  const tdesc = getThresholdLegendHtml(paramId, val);
+  const status = getStatus(tabId, paramId, cond);
+  const isEval = status === 'evaluado';
+  const badgeText = isEval ? scoreBadgeLabel(cur) : statusLabel(status);
+  const selectedEval = isEval ? ' selected' : '';
+  const selectedNR = status === 'no_responde' ? ' selected' : '';
+  const jval = getJustif(tabId, paramId, cond).replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  return '<div class="score-col">'+
+    '<div class="score-col-label '+lblClass+'">'+lblText+'</div>'+
+    '<select class="score-meta-select" onchange="syncStatus(\''+tabId+'\',\''+paramId+'\',\''+cond+'\',\''+uid+'\',this.value)">'+
+      '<option value="evaluado"'+selectedEval+'>Evaluado</option>'+
+      '<option value="no_responde"'+selectedNR+'>No responde</option>'+
+    '</select>'+
+    '<div class="score-input-wrap'+(isEval?'':' is-disabled')+'" id="wrap_'+uid+'">'+
+      '<input type="range" id="range_'+uid+'" class="score-range '+rangeClass+'" min="0" max="10" step="1" value="'+val+'" '+(isEval?'':'disabled')+' oninput="syncScore(\''+tabId+'\',\''+paramId+'\',\''+cond+'\',\'range\',\''+uid+'\')" />'+
+      '<input type="number" id="num_'+uid+'" class="score-number" min="0" max="10" step="1" value="'+val+'" '+(isEval?'':'disabled')+' oninput="syncScore(\''+tabId+'\',\''+paramId+'\',\''+cond+'\',\'num\',\''+uid+'\')" />'+
+    '</div>'+
+    '<div class="score-range-note">Valor entero entre 0 y 10.</div>'+
+    '<div id="badge_'+uid+'" class="'+badgeClass+'" style="'+badgeStyle+'">'+badgeText+'</div>'+
+    '<div id="tdesc_'+uid+'" class="score-threshold-desc">'+tdesc+'</div>'+
+    '<div class="justif-wrap"><textarea placeholder="Justificación técnica obligatoria..." onchange="setJustif(\''+tabId+'\',\''+paramId+'\',\''+cond+'\',this.value)">'+jval+'</textarea><div class="justif-required-note">Obligatoria para '+lblText+'.</div></div>'+
+  '</div>';
+}
+
+function showTab(idx) {
+  currentTab=idx;
+  renderTabButtons();
+  const ca=document.getElementById('content-area');
+  const ab=document.getElementById('actions-bar');
+  if(idx===4){renderResults(ca,ab);return;}
+
+  const tabla=tablas[idx];
+  let html='';
+  html+='<div class="section-card"><div class="section-header"><span class="section-tag '+tabla.tagClass+'">'+tabla.tag+'</span><span class="section-title">'+tabla.titulo+'</span></div>';
+
+  tabla.params.forEach(p=>{
+    html+='<div class="param-row">'+
+      '<div class="param-label">'+p.label+'</div>'+
+      '<div class="param-desc">'+p.desc+'</div>'+
+      '<div class="score-grid-3">'+
+        buildCol(tabla.id,p.id,'ci', 'lbl-ci', 'Condición Inicial (Ci: Pre-impacto < 1994)',   'ci-range')+
+        buildCol(tabla.id,p.id,'cf1','lbl-cf1','Condición Final 1 (Cf1: Efecto del proyecto sin ninguna medida de mitigación, año 2003-2006)',  'cf1-range')+
+        buildCol(tabla.id,p.id,'cf2','lbl-cf2','Condición Final 2 (Cf2: Efecto del proyecto después de aplicar medidas de mitigación, año 2023-2025)',  'cf2-range')+
+      '</div>'+
+    '</div>';
+  });
+  html+='</div>';
+
+  ca.innerHTML=html;
+  ab.innerHTML='';
+
+  if(idx>0){const b=document.createElement('button');b.className='btn-secondary';b.textContent='← Tabla anterior';b.onclick=()=>showTab(idx-1);ab.appendChild(b);}
+  if(idx<3){const b=document.createElement('button');b.className='btn-primary';b.textContent='Siguiente tabla →';b.onclick=()=>showTab(idx+1);ab.appendChild(b);}
+  else{const b=document.createElement('button');b.className='btn-success';b.textContent='Ver resultados →';b.onclick=()=>showTab(4);ab.appendChild(b);}
+}
+
+function calcAvg(vals){const v=vals.filter(x=>x!==undefined&&x!==null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+function fmtD(d){if(d===null)return'—';return(d>0?'+':'')+d.toFixed(2);}
+function dClass(d){if(d===null)return'delta-neu';return d<0?'delta-neg':d>0?'delta-pos':'delta-neu';}
+function mvClass(d){if(d===null)return'';return d<0?'neg':d>0?'pos':'';}
+function safeFileToken(val){return (val||'experto').toString().trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'');}
+function fmtCellNum(v){return v!==null&&v!==undefined&&!isNaN(v)?Number(v.toFixed(2)) : '';}
+function getSummaryById(tableSummaries, tableId) { return tableSummaries.find(s => s.id === tableId) || null; }
+function calcDeltaCondicion(tableSummaries, cfField){
+  const t5 = getSummaryById(tableSummaries, 'T5');
+  const t7 = getSummaryById(tableSummaries, 'T7');
+  const t11 = getSummaryById(tableSummaries, 'T11');
+  const t12 = getSummaryById(tableSummaries, 'T12');
+  function term(tab){
+    if (!tab || tab.aCi===null || tab[cfField]===null) return null;
+    return tab[cfField] - tab.aCi;
+  }
+  const dA = term(t5);
+  const dB = term(t7);
+  const dC1 = term(t11);
+  const dC2 = term(t12);
+  const deltaTerrestre = dA!==null && dB!==null ? (dA + dB) / 20 : null;
+  const deltaAcuatico = dA!==null && dC1!==null && dC2!==null ? (dA + dC1 + dC2) / 30 : null;
+  return { deltaTerrestre, deltaAcuatico, dA, dB, dC1, dC2 };
+}
+function initDefaults() {
+  tablas.forEach(t => t.params.forEach(p => ['ci','cf1','cf2'].forEach(cond => {
+    const key = skey(t.id,p.id,cond);
+    if (scores[key] === undefined) scores[key] = 0;
+    const st = stkey(t.id,p.id,cond);
+    if (statuses[st] === undefined) statuses[st] = 'evaluado';
+  })));
+}
+function buildExportAoa(payload){
+  const aoa = [];
+  aoa.push(['Panel Delphi - Compensación de Biodiversidad SEA']);
+  aoa.push(['Fecha', new Date().toLocaleString('es-CL')]);
+  aoa.push(['Experto', payload.name]);
+  aoa.push(['Completitud (%)', payload.pct]);
+  aoa.push([]);
+  aoa.push(['Delta de condición por escenario']);
+  aoa.push(['Escenario','δ condición terrestre','δ condición acuático']);
+  aoa.push([
+    'Sin mitigación (Ci vs Cf1)',
+    fmtCellNum(payload.deltaSinMitigation.deltaTerrestre),
+    fmtCellNum(payload.deltaSinMitigation.deltaAcuatico)
+  ]);
+  aoa.push([
+    'Con mitigación (Ci vs Cf2)',
+    fmtCellNum(payload.deltaWithMitigation.deltaTerrestre),
+    fmtCellNum(payload.deltaWithMitigation.deltaAcuatico)
+  ]);
+  aoa.push([]);
+  aoa.push(['Promedios por tabla']);
+  aoa.push(['Tabla','Ci promedio','Cf1 promedio','Cf2 promedio','Dif. promedio Cf1-Ci','Dif. promedio Cf2-Ci']);
+  payload.tableSummaries.forEach(s=>{
+    aoa.push([
+      s.titulo,
+      fmtCellNum(s.aCi),
+      fmtCellNum(s.aCf1),
+      fmtCellNum(s.aCf2),
+      fmtCellNum(s.d1),
+      fmtCellNum(s.d2)
+    ]);
+  });
+  aoa.push([]);
+  aoa.push([
+    'Tabla','Parametro',
+    'Estado Ci','Ci','Justificacion Ci',
+    'Estado Cf1','Cf1','Justificacion Cf1',
+    'Estado Cf2','Cf2','Justificacion Cf2',
+    'Delta Cf1-Ci','Delta Cf2-Ci'
+  ]);
+
+  tablas.forEach(t=>{
+    t.params.forEach(p=>{
+      const ci=scoreForCalc(t.id,p.id,'ci');
+      const cf1=scoreForCalc(t.id,p.id,'cf1');
+      const cf2=scoreForCalc(t.id,p.id,'cf2');
+      const pd1=ci!==undefined&&cf1!==undefined?cf1-ci:null;
+      const pd2=ci!==undefined&&cf2!==undefined?cf2-ci:null;
+      aoa.push([
+        t.titulo,
+        p.label,
+        statusLabel(getStatus(t.id,p.id,'ci')),
+        ci!==undefined?ci:'',
+        getJustif(t.id,p.id,'ci'),
+        statusLabel(getStatus(t.id,p.id,'cf1')),
+        cf1!==undefined?cf1:'',
+        getJustif(t.id,p.id,'cf1'),
+        statusLabel(getStatus(t.id,p.id,'cf2')),
+        cf2!==undefined?cf2:'',
+        getJustif(t.id,p.id,'cf2'),
+        fmtCellNum(pd1),
+        fmtCellNum(pd2)
+      ]);
+    });
+  });
+  return aoa;
+}
+function exportResultsXlsx(payload){
+  if(typeof XLSX==='undefined'){
+    alert('No fue posible cargar la librería para exportar a XLSX. Revise su conexión e intente nuevamente.');
+    return null;
+  }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(buildExportAoa(payload));
+  XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
+  const fileName = 'delphi_'+safeFileToken(payload.name)+'_ronda1.xlsx';
+  XLSX.writeFile(wb, fileName);
+  return fileName;
+}
+function openMailDraft(payload, fileName){
+  const subject = encodeURIComponent('Resultados Panel Delphi - '+payload.name);
+  const tableLines = payload.tableSummaries.map(s=>
+    '- '+s.titulo+': Ci='+(s.aCi!==null?s.aCi.toFixed(2):'N/A')+
+    ', Cf1='+(s.aCf1!==null?s.aCf1.toFixed(2):'N/A')+
+    ', Cf2='+(s.aCf2!==null?s.aCf2.toFixed(2):'N/A')
+  ).join('\n');
+  const body = encodeURIComponent(
+    'Hola,\n\nComparto los resultados del Panel Delphi.\n\n'+
+    'Experto: '+payload.name+'\n'+
+    'Completitud: '+payload.pct+'%\n'+
+    '\nDelta de condición:\n'+
+    '- Sin mitigación (Ci vs Cf1): terrestre='+(payload.deltaSinMitigation.deltaTerrestre!==null?payload.deltaSinMitigation.deltaTerrestre.toFixed(4):'N/A')+', acuático='+(payload.deltaSinMitigation.deltaAcuatico!==null?payload.deltaSinMitigation.deltaAcuatico.toFixed(4):'N/A')+'\n'+
+    '- Con mitigación (Ci vs Cf2): terrestre='+(payload.deltaWithMitigation.deltaTerrestre!==null?payload.deltaWithMitigation.deltaTerrestre.toFixed(4):'N/A')+', acuático='+(payload.deltaWithMitigation.deltaAcuatico!==null?payload.deltaWithMitigation.deltaAcuatico.toFixed(4):'N/A')+'\n'+
+    '\nPromedios por tabla:\n'+tableLines+'\n\n'+
+    'Archivo XLSX generado: '+(fileName||'delphi_resultados.xlsx')+'\n'+
+    'Nota: por seguridad del navegador, adjunte manualmente el archivo al correo.\n'
+  );
+  window.location.href='mailto:jflores@cienciambiental.cl?subject='+subject+'&body='+body;
+}
+
+function renderResults(ca,ab){
+  const name=document.getElementById('expert-name').value.trim()||'Experto sin nombre';
+  const f=countFilled(),tot=totalParams(),pct=Math.round((f/tot)*100);
+
+  const tableSummaries = tablas.map(t=>{
+    const aCi=calcAvg(t.params.map(p=>scoreForCalc(t.id,p.id,'ci')));
+    const aCf1=calcAvg(t.params.map(p=>scoreForCalc(t.id,p.id,'cf1')));
+    const aCf2=calcAvg(t.params.map(p=>scoreForCalc(t.id,p.id,'cf2')));
+    const d1=aCi!==null&&aCf1!==null?aCf1-aCi:null;
+    const d2=aCi!==null&&aCf2!==null?aCf2-aCi:null;
+    return { id:t.id, titulo:t.titulo, tag:t.tag, tagClass:t.tagClass, aCi, aCf1, aCf2, d1, d2, params:t.params };
+  });
+  const deltaSinMitigation = calcDeltaCondicion(tableSummaries, 'aCf1');
+  const deltaWithMitigation = calcDeltaCondicion(tableSummaries, 'aCf2');
+
+  let html='';
+  if(f<tot) html+='<div class="warn-incomplete">Atención: quedan '+(tot-f)+' parámetro(s) sin completar. Los resultados son parciales.</div>';
+
+  html+='<div class="results-panel"><div class="results-title">Resumen — '+name+'</div>'+
+    '<div class="summary-grid">'+
+      '<div class="metric-card"><div class="metric-label">Completitud</div><div class="metric-value">'+pct+'%</div></div>'+
+      '<div class="metric-card"><div class="metric-label">δ condición terrestre sin mitigación</div><div class="metric-value '+mvClass(deltaSinMitigation.deltaTerrestre)+'">'+fmtD(deltaSinMitigation.deltaTerrestre)+'</div></div>'+
+      '<div class="metric-card"><div class="metric-label">δ condición terrestre con mitigación</div><div class="metric-value '+mvClass(deltaWithMitigation.deltaTerrestre)+'">'+fmtD(deltaWithMitigation.deltaTerrestre)+'</div></div>'+
+      '<div class="metric-card"><div class="metric-label">δ condición acuático sin mitigación</div><div class="metric-value '+mvClass(deltaSinMitigation.deltaAcuatico)+'">'+fmtD(deltaSinMitigation.deltaAcuatico)+'</div></div>'+
+      '<div class="metric-card"><div class="metric-label">δ condición acuático con mitigación</div><div class="metric-value '+mvClass(deltaWithMitigation.deltaAcuatico)+'">'+fmtD(deltaWithMitigation.deltaAcuatico)+'</div></div>'+
+    '</div>';
+
+  tableSummaries.forEach(t=>{
+    html+='<div><div class="result-section-header">'+
+      '<span class="section-tag '+t.tagClass+'">'+t.tag+'</span>'+
+      '<span style="font-size:13px;font-weight:500;">'+t.titulo+'</span>'+
+      '<span style="margin-left:auto;display:flex;gap:5px;">'+
+        '<span class="result-chip chip-ci" title="Ci promedio de la tabla">Ci prom: '+(t.aCi!==null?t.aCi.toFixed(2):'—')+'</span>'+
+        '<span class="result-chip chip-cf1" title="Cf1 promedio de la tabla">Cf1 prom: '+(t.aCf1!==null?t.aCf1.toFixed(2):'—')+'</span>'+
+        '<span class="result-chip chip-cf2" title="Cf2 promedio de la tabla">Cf2 prom: '+(t.aCf2!==null?t.aCf2.toFixed(2):'—')+'</span>'+
+        (t.d1!==null?'<span class="delta-chip '+dClass(t.d1)+'" title="Diferencia de promedio Cf1−Ci">Dif1: '+fmtD(t.d1)+'</span>':'')+
+        (t.d2!==null?'<span class="delta-chip '+dClass(t.d2)+'" title="Diferencia de promedio Cf2−Ci">Dif2: '+fmtD(t.d2)+'</span>':'')+
+      '</span></div>';
+    t.params.forEach(p=>{
+      const ci=scoreForCalc(t.id,p.id,'ci'),cf1=scoreForCalc(t.id,p.id,'cf1'),cf2=scoreForCalc(t.id,p.id,'cf2');
+      const pd1=ci!==undefined&&cf1!==undefined?cf1-ci:null;
+      const pd2=ci!==undefined&&cf2!==undefined?cf2-ci:null;
+      const jCi=getJustif(t.id,p.id,'ci');
+      const jCf1=getJustif(t.id,p.id,'cf1');
+      const jCf2=getJustif(t.id,p.id,'cf2');
+      html+='<div class="result-row">'+
+        '<span class="result-name">'+p.label+'</span>'+
+        '<div class="result-chips">'+
+          '<span class="result-chip chip-ci">Ci: '+displayScore(t.id,p.id,'ci')+'</span>'+
+          '<span class="result-chip chip-cf1">Cf1: '+displayScore(t.id,p.id,'cf1')+'</span>'+
+          '<span class="result-chip chip-cf2">Cf2: '+displayScore(t.id,p.id,'cf2')+'</span>'+
+          (pd1!==null?'<span class="delta-chip '+dClass(pd1)+'" title="Diferencia Cf1−Ci">'+fmtD(pd1)+'</span>':'')+
+          (pd2!==null?'<span class="delta-chip '+dClass(pd2)+'" title="Diferencia Cf2−Ci">'+fmtD(pd2)+'</span>':'')+
+        '</div>'+
+        '<div class="justif-result">Ci: '+(jCi||'Sin justificación')+' | Cf1: '+(jCf1||'Sin justificación')+' | Cf2: '+(jCf2||'Sin justificación')+'</div>'+
+      '</div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  ca.innerHTML=html;
+  ab.innerHTML='';
+
+  const back=document.createElement('button');
+  back.className='btn-secondary';back.textContent='← Volver a las tablas';back.onclick=()=>showTab(0);ab.appendChild(back);
+
+  const payload={name,pct,tableSummaries,deltaSinMitigation,deltaWithMitigation};
+
+  const exp=document.createElement('button');
+  exp.className='btn-export';
+  exp.textContent='Exportar respuestas (.xlsx)';
+  exp.onclick=()=>{ exportResultsXlsx(payload); };
+  ab.appendChild(exp);
+
+  const mail=document.createElement('button');
+  mail.className='btn-success';
+  mail.textContent='Enviar borrador a jflores@cienciambiental.cl';
+  mail.onclick=()=>{
+    const fileName = exportResultsXlsx(payload);
+    openMailDraft(payload, fileName);
+  };
+  ab.appendChild(mail);
+}
+
+initDefaults();
+showTab(0);
+updateProgress();
+</script>
+</body>
+</html>
+
